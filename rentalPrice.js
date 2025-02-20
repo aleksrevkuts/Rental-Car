@@ -13,7 +13,10 @@ function calculatePrice(pickup, dropoff, pickupDate, dropoffDate, type, age, lic
         return "Driver does not meet rental requirements";
     }
 
+    let weekendDays = countWeekendDays(pickupDate, dropoffDate);
+
     let rentalPrice = getRentalPrice(age, days);
+    rentalPrice = rentalPrice - (rentalPrice / days * weekendDays) + (rentalPrice / days * weekendDays) * 1.05;
     rentalPrice = isDriverUnder25(rentalPrice, age, carType, season);
     rentalPrice = isHighSeason(rentalPrice, season);
     rentalPrice = isLongRent(rentalPrice, days, season);
@@ -54,6 +57,22 @@ function isLongRent(price, days, season) {
     }
     return price;
 }
+
+function countWeekendDays(pickupDate, dropoffDate) {
+    let count = 0;
+    let start = new Date(pickupDate);
+    let end = new Date(dropoffDate);
+
+    while (start <= end) {
+        const day = start.getDay();
+        if (day === 6 || day === 0) {
+            count++;
+        }
+        start.setDate(start.getDate() + 1);
+    }
+    return count;
+}
+
 
 function applyLicensePenalty(price, licenseYears, days, season) {
     if (licenseYears < 2) {
@@ -108,7 +127,6 @@ function getSeason(pickupDate, dropoffDate) {
 }
 
 exports.calculatePrice = calculatePrice;
-exports.isHighSeason = isHighSeason;
-exports.isDriverUnder25 = isDriverUnder25;
-exports.isLongRent = isLongRent;
-exports.applyLicensePenalty = applyLicensePenalty;
+exports.countWeekendDays = countWeekendDays;
+
+
